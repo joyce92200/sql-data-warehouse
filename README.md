@@ -3,6 +3,8 @@
 Welcome to the **Data Warehousing and Analytics Solution** repository!
 This project demonstrates a comperehensive data warehousing and analytics solution, from building a data warehouse to generating actionable insights. Designed to highlight industry best practices in data enginerring and analtyics. 
 
+---
+
 ## Project Requirements
 
 ### Building the Data Warehouse (Data Engineering)
@@ -18,6 +20,7 @@ Develop a modern data warehouse using SQL Server to consolidate sales data, enab
 - **Documentation** : Provide clear documentation of the data model to support both business stakeholders and analytics teams.
 
 ---
+
 ### BI: Anlaytics and Reporting (Data Analytics)
 
 #### Objective
@@ -29,9 +32,8 @@ Develop SQL-based analytics to deliver detailed insights into :
 - These insights empower stakeholders with KPI metrics, enabling strategic decision-making.
 
 ---
+
 ## License 
 This project is licensed under the MIT License. You are free to use, modify, and share this project with proper attribution.
 
-## About Me
-
-Hi there! 
+ere! 
