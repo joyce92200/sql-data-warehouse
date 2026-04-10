@@ -1,3 +1,58 @@
+-- daily used script to refresh  
+TRUNCATE TABLE bronze.crm_cust_info
+BULK INSERT bronze.crm_cust_info
+FROM 'C:\Users\jowor\OneDrive\Documents\1_Project\Baraa\source_crm\cust_info.csv'
+WITH (
+	FIRSTROW = 2,
+	FIELDTERMINATOR = ',',
+	TABLOCK
+);
+
+TRUNCATE TABLE bronze.crm_prd_info -- refresh
+BULK INSERT bronze.crm_prd_info
+FROM 'C:\Users\jowor\OneDrive\Documents\1_Project\Baraa\source_crm\prd_info.csv'
+WITH (
+	FIRSTROW = 2,
+	FIELDTERMINATOR = ',',
+	TABLOCK
+);
+
+TRUNCATE TABLE bronze.crm_sales_details -- refresh
+BULK INSERT bronze.crm_sales_details
+FROM 'C:\Users\jowor\OneDrive\Documents\1_Project\Baraa\source_crm\sales_details.csv'
+WITH (
+	FIRSTROW = 2,
+	FIELDTERMINATOR = ',',
+	TABLOCK
+);
+
+TRUNCATE TABLE bronze.erp_cust_az12 -- refresh
+BULK INSERT bronze.erp_cust_az12
+FROM 'C:\Users\jowor\OneDrive\Documents\1_Project\Baraa\source_erp\CUST_AZ12.csv'
+WITH (
+	FIRSTROW = 2,
+	FIELDTERMINATOR = ',',
+	TABLOCK
+);
+
+TRUNCATE TABLE bronze.erp_loc_a101 -- refresh
+BULK INSERT bronze.erp_loc_a101
+FROM 'C:\Users\jowor\OneDrive\Documents\1_Project\Baraa\source_erp\LOC_A101.csv'
+WITH (
+	FIRSTROW = 2,
+	FIELDTERMINATOR = ',',
+	TABLOCK
+);
+
+TRUNCATE TABLE bronze.erp_px_cat_g1v2 -- refresh
+BULK INSERT bronze.erp_px_cat_g1v2
+FROM 'C:\Users\jowor\OneDrive\Documents\1_Project\Baraa\source_erp\PX_CAT_G1V2.csv'
+WITH (
+	FIRSTROW = 2,
+	FIELDTERMINATOR = ',',
+	TABLOCK
+);
+
 --  save frequently used SQL code in stored procedures in database
 CREATE OR ALTER PROCEDURE bronze.load_bronze AS 
 BEGIN
