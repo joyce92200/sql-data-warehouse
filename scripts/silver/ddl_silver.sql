@@ -115,3 +115,16 @@ FROM (
    FROM bronze.crm_cust_info
    ) AS temp
 WHERE flag_last = 1
+
+--- silver.crm_prd_info 
+SELECT
+prd_id,
+prd_key,
+REPLACE(SUBSTRING(prd_key, 1, 5), '-', '_') AS category_id,
+SUBSTRING(prd_key, 7, LEN(prd_key)) AS prd_key,
+prd_nm,
+prd_cost,
+prd_line,
+prd_start_dt,
+prd_end_dt
+FROM bronze.crm_prd_info
