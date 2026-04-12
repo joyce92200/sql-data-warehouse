@@ -1,18 +1,49 @@
---- creation, data cleansing, data ingestion of silver.crm_cust_info
 IF OBJECT_ID('silver.crm_cust_info', 'U') IS NOT NULL
 DROP TABLE silver.crm_cust_info;
 
 CREATE TABLE silver.crm_cust_info (
-   cst_id INT,
-   cst_key NVARCHAR(50),
-   cst_firstname NVARCHAR(50),
-   cst_lastname NVARCHAR(50),
-   cst_material_status NVARCHAR(50),
-   cst_gndr NVARCHAR(50),  
-   cst_create_date DATE,
-   dwh_create_date DATETIME2 DEFAULT GETDATE()
+	cst_id INT,
+	cst_key NVARCHAR(50),
+	cst_firstname NVARCHAR(50),
+	cst_lastname NVARCHAR(50),
+	cst_marital_status NVARCHAR(50),
+	cst_gndr NVARCHAR(50),  
+	cst_create_date DATE,
+	dwh_create_date DATETIME2 DEFAULT GETDATE()
 );
---- creation, data cleansing, data ingestion of silver.crm_prd_info
+
+INSERT INTO silver.crm_cust_info (
+	cst_id,
+	cst_key,
+	cst_firstname,
+	cst_lastname,
+	cst_marital_status,
+	cst_gndr,  
+	cst_create_date
+)
+
+SELECT
+cst_id,
+cst_key,
+TRIM(cst_firstname) AS cst_firstname,
+TRIM(cst_lastname) AS cst_lastname,
+CASE UPPER(TRIM(cst_marital_status))
+	WHEN 'S' THEN 'Single'
+	WHEN 'M' THEN 'Married'
+	ELSE 'n/a'
+END AS cst_marital_status,
+CASE UPPER(TRIM(cst_gndr))
+	WHEN 'F' THEN 'Female'
+	WHEN 'M' THEN 'Male'
+	ELSE 'n/a'
+END AS cst_gndr,
+cst_create_date
+FROM (SELECT *,
+	ROW_NUMBER() OVER(PARTITION BY cst_id ORDER BY cst_create_date DESC) as flag_last
+	FROM bronze.crm_cust_info
+	WHERE cst_id IS NOT NULL )t
+WHERE flag_last = 1
+
 IF OBJECT_ID('silver.crm_prd_info', 'U') IS NOT NULL
 DROP TABLE silver.crm_prd_info;
 
@@ -64,7 +95,6 @@ CAST(
 FROM bronze.crm_prd_info
 --end
 
---- creation, data cleansing, data ingestion of silver.crm_sales_details
 IF OBJECT_ID('silver.crm_sales_details', 'U') IS NOT NULL
 DROP TABLE silver.crm_sales_details;
 
@@ -121,12 +151,7 @@ SELECT
    THEN sls_sales / NULLIF(sls_quantity, 0)
    ELSE sls_price
    END AS sls_price
-
 FROM bronze.crm_sales_details
-
-
-
---end
 
 IF OBJECT_ID('silver.erp_CUST_AZ12', 'U') IS NOT NULL
 DROP TABLE silver.erp_cust_az12;
@@ -158,14 +183,6 @@ END AS gen
 FROM bronze.erp_cust_az12
 
 
--- identify out-of-range dates
-SELECT DISTINCT
-bdate
-FROM silver.erp_cust_az12
-WHERE bdate < '1924-01-01' OR bdate > GETDATE()
-
----end
-
 IF OBJECT_ID('silver.erp_LOC_A101', 'U') IS NOT NULL
 DROP TABLE silver.erp_loc_a101;
 
@@ -195,80 +212,3 @@ cat,
 subcat,
 maintenance
 FROM bronze.erp_px_cat_g1v2
-
-
-
--- (template) check for unwanted spaces
--- expectation: no result
-
-SELECT prd_nm
-FROM bronze.crm_prd_info
-WHERE prd_nm != TRIM(prd_nm)
-
--- (template) check for NULLs or negative numbers
--- expectation : no result 
-SELECT prd_nm
-FROM bronze.crm_prd_info
-WHERE prd_nm != TRIM(prd_nm)
-
-SELECT prd_cost
-FROM bronze.crm_prd_info
-WHERE prd_cost < 0 OR prd_cost IS NULL
-
--- (tempalte) data standarization & consistency
-SELECT DISTINCT prd_line
-FROM bronze.crm_prd_info
-
--- (template) check for NULLs or Duplicates in Primary Key
--- Expectation : No Result
-SELECT
-cst_id,
-COUNT(*)
-FROM bronze.crm_cust_info
-GROUP BY cst_id
-HAVING COUNT(*) > 1 OR cst_id IS NULL
-
--- (template) data cleansing
-INSERT INTO silver.crm_cust_info(
-   cst_id,
-   cst_key,
-   cst_firstname,
-   cst_lastname,
-   cst_marital_status,
-   cst_gndr,
-   cst_create_date)
-   
-SELECT 
-cst_id,
-cst_key,
-TRIM(cst_firstname) AS cst_firstname_clean,
-TRIM(cst_lastname) AS cst_lastname_clean,
-CASE 
-    WHEN UPPER(TRIM(cst_marital_status)) = 'S' THEN 'Single'
-    WHEN UPPER(TRIM(cst_marital_status)) = 'M' THEN 'Married' 
-    ELSE 'n/a' 
-END AS cst_marital_status_clean,
-CASE
-    WHEN UPPER(TRIM(cst_gndr)) = 'F' THEN 'Female'
-    WHEN UPPER(TRIM(cst_gndr)) = 'M' THEN 'Male' 
-    ELSE 'n/a' 
-END AS cst_gndr_clean,
-cst_create_date
-FROM (
-   SELECT *, 
-   ROW_NUMBER() OVER (PARTITION BY cst_id ORDER BY cst_create_date DESC) AS flag_last
-   FROM bronze.crm_cust_info
-   ) AS temp
-WHERE flag_last = 1
-
--- checking for invalid data orders
-SELECT *
-FROM silver.crm_sales_details
-WHERE sls_order_dt > sls_ship_dt OR sls_order_dt > sls_due_dt
-
--- identify out-of-range dates
-SELECT DISTINCT
-bdate
-FROM silver.erp_cust_az12
-WHERE bdate < '1924-01-01' OR bdate > GETDATE()
-
