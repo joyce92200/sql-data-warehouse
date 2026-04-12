@@ -84,9 +84,9 @@ CREATE TABLE bronze.crm_sales_details (
     sls_ord_num NVARCHAR(50),
     sls_prd_key NVARCHAR(50),
     sls_cust_id INT,
-    sls_order_dt NVARCHAR(50),   
-    sls_ship_dt NVARCHAR(50),    
-    sls_due_dt NVARCHAR(50),     
+    sls_order_dt DATE,   
+    sls_ship_dt DATE,    
+    sls_due_dt DATE,     
     sls_sales INT,
     sls_quantity INT,
     sls_price INT
@@ -118,55 +118,56 @@ CREATE TABLE bronze.erp_px_cat_g1v2 (
     MAINTENANCE NVARCHAR(50)
 );
 
+-- refresh the tables and bulk insert csv.files to bronze layer
 
 TRUNCATE TABLE bronze.crm_cust_info
 BULK INSERT bronze.crm_cust_info
-FROM 'C:\Users\jowor\OneDrive\Documents\1_Project\Baraa\source_crm\cust_info.csv'
+FROM 'C:\DataPortfolio\source_crm\cust_info.csv'
 WITH (
 	FIRSTROW = 2,
 	FIELDTERMINATOR = ',',
 	TABLOCK
 );
 
-TRUNCATE TABLE bronze.crm_prd_info -- refresh
+TRUNCATE TABLE bronze.crm_prd_info 
 BULK INSERT bronze.crm_prd_info
-FROM 'C:\Users\jowor\OneDrive\Documents\1_Project\Baraa\source_crm\prd_info.csv'
+FROM 'C:\DataPortfolio\source_crm\prd_info.csv'
 WITH (
 	FIRSTROW = 2,
 	FIELDTERMINATOR = ',',
 	TABLOCK
 );
 
-TRUNCATE TABLE bronze.crm_sales_details -- refresh
+TRUNCATE TABLE bronze.crm_sales_details 
 BULK INSERT bronze.crm_sales_details
-FROM 'C:\Users\jowor\OneDrive\Documents\1_Project\Baraa\source_crm\sales_details.csv'
+FROM 'C:\DataPortfolio\source_crm\sales_details.csv'
 WITH (
 	FIRSTROW = 2,
 	FIELDTERMINATOR = ',',
 	TABLOCK
 );
 
-TRUNCATE TABLE bronze.erp_cust_az12 -- refresh
+TRUNCATE TABLE bronze.erp_cust_az12 
 BULK INSERT bronze.erp_cust_az12
-FROM 'C:\Users\jowor\OneDrive\Documents\1_Project\Baraa\source_erp\CUST_AZ12.csv'
+FROM 'C:\DataPortfolio\source_erp\CUST_AZ12.csv'
 WITH (
 	FIRSTROW = 2,
 	FIELDTERMINATOR = ',',
 	TABLOCK
 );
 
-TRUNCATE TABLE bronze.erp_loc_a101 -- refresh
+TRUNCATE TABLE bronze.erp_loc_a101 
 BULK INSERT bronze.erp_loc_a101
-FROM 'C:\Users\jowor\OneDrive\Documents\1_Project\Baraa\source_erp\LOC_A101.csv'
+FROM 'C:\DataPortfolio\source_erp\LOC_A101.csv'
 WITH (
 	FIRSTROW = 2,
 	FIELDTERMINATOR = ',',
 	TABLOCK
 );
 
-TRUNCATE TABLE bronze.erp_px_cat_g1v2 -- refresh
+TRUNCATE TABLE bronze.erp_px_cat_g1v2 
 BULK INSERT bronze.erp_px_cat_g1v2
-FROM 'C:\Users\jowor\OneDrive\Documents\1_Project\Baraa\source_erp\PX_CAT_G1V2.csv'
+FROM 'C:\DataPortfolio\source_erp\PX_CAT_G1V2.csv'
 WITH (
 	FIRSTROW = 2,
 	FIELDTERMINATOR = ',',
