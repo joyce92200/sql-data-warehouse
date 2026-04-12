@@ -192,6 +192,15 @@ CNTRY NVARCHAR(50),
 dwh_create_date DATETIME2 DEFAULT GETDATE()
 );
 
+INSERT INTO silver.erp_loc_a101 (
+    CID,
+    CNTRY
+)
+SELECT
+    CID,
+    CNTRY
+FROM bronze.erp_loc_a101
+
 IF OBJECT_ID('silver.erp_PX_CAT_G1V2', 'U') IS NOT NULL
 DROP TABLE silver.erp_px_cat_g1v2;
 
