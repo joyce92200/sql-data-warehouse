@@ -197,7 +197,7 @@ INSERT INTO silver.erp_loc_a101 (
     CNTRY
 )
 SELECT
-    CID,
+    REPLACE(CID, '-', '') AS cid,
     CNTRY
 FROM bronze.erp_loc_a101
 
