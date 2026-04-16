@@ -182,7 +182,7 @@ END AS gen
 
 FROM bronze.erp_cust_az12
 
-
+--- create table for silver.erp_LOC-A101
 IF OBJECT_ID('silver.erp_LOC_A101', 'U') IS NOT NULL
 DROP TABLE silver.erp_loc_a101;
 
@@ -198,9 +198,19 @@ INSERT INTO silver.erp_loc_a101 (
 )
 SELECT
     REPLACE(CID, '-', '') AS cid,
-    CNTRY
+    CASE UPPER(TRIM(CNTRY))
+        WHEN 'USA' THEN 'United States'
+        WHEN 'US' THEN 'United States'
+        WHEN 'DE' THEN 'Germany'
+        WHEN NULL THEN 'n/a'
+        WHEN '' THEN 'n/a'
+        ELSE cntry
+    END AS cntry
+
 FROM bronze.erp_loc_a101
 
+-------
+	
 IF OBJECT_ID('silver.erp_PX_CAT_G1V2', 'U') IS NOT NULL
 DROP TABLE silver.erp_px_cat_g1v2;
 
