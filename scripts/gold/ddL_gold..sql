@@ -89,7 +89,7 @@ ON ci.cst_key = la.CID
 
 -- Build Gold Layer - Create Dimension Products
 -- After joining table, check if any duplicates were introduced by the join logic : GROUP BY subquery
-SELECT prd_key, COUNT(*) FROM (
+SELECT product_number, COUNT(*) FROM (
 SELECT
 	ROW_NUMBER() OVER(ORDER BY pn.prd_start_dt, pn.prd_key) AS product_key,
 	pn.prd_id AS product_id,
@@ -106,7 +106,7 @@ FROM silver.crm_prd_info AS pn
 LEFT JOIN silver.erp_px_cat_g1v2 AS pc
 ON pn.category_id = pc.id
 WHERE prd_end_dt IS NULL  )t -- filter out all historical data
-GROUP BY prd_key
+GROUP BY product_number
 HAVING COUNT(*) >1
 
 -- Create View Dimension Products
