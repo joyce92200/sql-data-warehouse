@@ -25,7 +25,10 @@ INSERT INTO silver.crm_cust_info (
 SELECT
 cst_id,
 cst_key,
-TRIM(cst_firstname) AS cst_firstname,
+CASE 
+	WHEN TRIM(cst_firstname) = 'Andr챕s' THEN 'Andrews' 
+	ELSE TRIM(cst_firstname)
+	END AS cst_firstname,
 TRIM(cst_lastname) AS cst_lastname,
 CASE UPPER(TRIM(cst_marital_status))
 	WHEN 'S' THEN 'Single'
@@ -93,7 +96,6 @@ CAST(
    AS DATE
    ) AS prd_end_dt --- calculate end date as one day before the next start date
 FROM bronze.crm_prd_info
---end
 
 IF OBJECT_ID('silver.crm_sales_details', 'U') IS NOT NULL
 DROP TABLE silver.crm_sales_details;
@@ -110,7 +112,6 @@ CREATE TABLE silver.crm_sales_details (
    sls_price INT,
    dwh_create_date DATETIME2 DEFAULT GETDATE()
 );
-
 
 INSERT INTO silver.crm_sales_details(
 sls_ord_num,
@@ -145,12 +146,13 @@ SELECT
    ELSE sls_sales
    END AS sls_sales,
    
-   sls_quantity,
-   
-   CASE WHEN sls_price IS NULL OR sls_price <= 0
-   THEN sls_sales / NULLIF(sls_quantity, 0)
-   ELSE sls_price
-   END AS sls_price
+	sls_quantity,
+	
+	CASE WHEN sls_price IS NULL OR sls_price <= 0
+	THEN sls_sales / NULLIF(sls_quantity, 0)
+	ELSE sls_price
+	END AS sls_price
+
 FROM bronze.crm_sales_details
 
 IF OBJECT_ID('silver.erp_CUST_AZ12', 'U') IS NOT NULL
@@ -163,10 +165,13 @@ GEN NVARCHAR(10),
 dwh_create_date DATETIME2 DEFAULT GETDATE()
 );
 
-INSERT INTO silver.erp_cust_az12(cid, bdate, gen)
+INSERT INTO silver.erp_cust_az12 (
+	cid, 
+	bdate, 
+	gen
+	)
 
 SELECT 
-
 CASE WHEN cid LIKE 'NAS%' THEN SUBSTRING(cid, 4, LEN(cid))
 ELSE cid
 END AS cid,
@@ -182,7 +187,6 @@ END AS gen
 
 FROM bronze.erp_cust_az12
 
---- create table for silver.erp_LOC-A101
 IF OBJECT_ID('silver.erp_LOC_A101', 'U') IS NOT NULL
 DROP TABLE silver.erp_loc_a101;
 
@@ -209,8 +213,6 @@ SELECT
 
 FROM bronze.erp_loc_a101
 
--------
-	
 IF OBJECT_ID('silver.erp_PX_CAT_G1V2', 'U') IS NOT NULL
 DROP TABLE silver.erp_px_cat_g1v2;
 
@@ -222,12 +224,17 @@ MAINTENANCE NVARCHAR(50),
 dwh_create_date DATETIME2 DEFAULT GETDATE()
 );
 
-INSERT INTO silver.erp_px_cat_g1v2 
-(id, cat, subcat, maintenance)
+INSERT INTO silver.erp_px_cat_g1v2 (
+	id, 
+	cat, 
+	subcat, 
+	maintenance
+	)
 
 SELECT
 id, 
 cat,
 subcat,
 maintenance
+
 FROM bronze.erp_px_cat_g1v2
